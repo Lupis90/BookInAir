@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Scanner Biblioteca</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/static/favicon.png">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- CSS principale -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+    
+    <!-- Prevenzione della cache per iOS -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+</head>
+<body>
+    <div class="container scanner-page">
+        <!-- Header con pulsante indietro -->
+        <div class="page-header">
+            <a href="/" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Torna alla home
+            </a>
+            <h1>Scansiona Libro</h1>
+        </div>
+
+        <!-- Contenuto principale scanner -->
+        <div class="scanner-content">
+            <!-- Istruzioni -->
+            <div class="scanner-instructions">
+                <div class="instruction-card">
+                    <i class="fas fa-barcode"></i>
+                    <h3>Scansiona il codice ISBN</h3>
+                    <p>Posiziona il codice a barre del libro all'interno dell'area di scansione</p>
+                </div>
+            </div>
+
+            <!-- Controlli scanner -->
+            <div class="controls-container">
+                <button class="control-button" onclick="toggleScanner()">
+                    <i class="fas fa-camera"></i>
+                    <span>Avvia Scanner</span>
+                </button>
+            </div>
+
+            <!-- Banner messaggi -->
+            <div id="success-message" class="message-banner"></div>
+
+            <!-- Container scanner -->
+            <div id="scanner-container" class="scanner-viewport" style="display: none;">
+                <div id="interactive" class="viewport"></div>
+            </div>
+
+            <!-- Display risultato -->
+            <div id="result" class="result-display">
+                <div class="status-indicator">
+                    Scanner pronto
+                </div>
+            </div>
+
+            <!-- Informazioni libro -->
+            <div class="book-info"></div>
+
+            <!-- Container QR scanner posizione (spostato più in alto e reso più prominente) -->
+            <div id="qr-location-container" class="qr-location-scanner" style="display: none;">
+                <div class="location-scan-prompt">
+                    <h3>Scansiona il QR Code della Posizione</h3>
+                    <p>Inquadra il codice QR per registrare la posizione del libro</p>
+                </div>
+                <div id="qr-reader" class="qr-reader-viewport"></div>
+                <div class="qr-scan-actions">
+                    <button onclick="skipLocationScan()" class="skip-btn">
+                        <i class="fas fa-times"></i> Salta
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preview libreria -->
+        <div id="library" class="library-preview">
+            <h2>Ultimi libri aggiunti</h2>
+            <div class="table-container">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Titolo</th>
+                            <th>Autore</th>
+                            <th>Generi</th>
+                            <th>Posizione</th>
+                        </tr>
+                    </thead>
+                    <tbody id="library-content">
+                        <!-- I contenuti della tabella verranno inseriti dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Quagga.js per la scansione dei codici a barre -->
+    <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
+    
+    <!-- html5-qrcode per la scansione dei QR code -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    
+    <!-- Script personalizzati -->
+    <script src="/static/js/scanner.js"></script>
+
+    <!-- Prevenzione dello zoom su iOS -->
+    <script>
+        document.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca Personale</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- CSS principale -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Biblioteca Personale</h1>
+            <p class="header-description">Gestisci la tua collezione di libri in modo semplice ed efficiente</p>
+        </div>
+
+        <!-- Azioni principali -->
+        <div class="actions-container">
+            <a href="/scanner" class="action-card">
+                <i class="fas fa-barcode"></i>
+                <h3>Aggiungi Libro</h3>
+                <p>Scansiona il codice ISBN per aggiungere un nuovo libro</p>
+            </a>
+            <a href="/search" class="action-card">
+                <i class="fas fa-search"></i>
+                <h3>Cerca Libro</h3>
+                <p>Cerca tra i tuoi libri per titolo o autore</p>
+            </a>
+        </div>
+
+        <!-- Sezione archivio -->
+        <div class="search-section">
+            <h2>Il tuo archivio</h2>
+            <div class="results-container">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Titolo</th>
+                            <th>Autore</th>
+                            <th>ISBN</th>
+                            <th>Data Pubblicazione</th>
+                            <th>Generi</th>
+                            <th>Posizione</th>
+                            <th>Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody id="library-content">
+                        <!-- Il contenuto verrà caricato dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Funzione per caricare i libri
+        function loadBooks() {
+            fetch('/books')
+                .then(response => response.json())
+                .then(updateLibraryTable)
+                .catch(error => {
+                    console.error('Error:', error);
+                    showMessage('Errore nel caricamento della libreria', true);
+                });
+        }
+
+        // Funzione per aggiornare la tabella
+        function updateLibraryTable(books) {
+            const content = document.getElementById('library-content');
+            if (!content) return;
+            
+            if (books.length === 0) {
+                content.innerHTML = '<tr><td colspan="7" class="text-center">Nessun libro presente</td></tr>';
+                return;
+            }
+            
+            content.innerHTML = books.map(book => `
+                <tr>
+                    <td>${book.title}</td>
+                    <td>${book.author}</td>
+                    <td>${book.isbn}</td>
+                    <td>${book.publish_date || 'N/A'}</td>
+                    <td>${book.genres || 'N/A'}</td>
+                    <td>${book.location || 'Non specificata'}</td>
+                    <td>
+                        <button onclick="deleteBook('${book.isbn}')" class="delete-button">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Funzione per eliminare un libro
+        function deleteBook(isbn) {
+            if (confirm('Sei sicuro di voler eliminare questo libro?')) {
+                fetch(`/delete_book/${isbn}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        loadBooks(); // Ricarica la lista
+                        showMessage('Libro eliminato con successo');
+                    } else {
+                        throw new Error(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showMessage('Errore durante l\'eliminazione del libro', true);
+                });
+            }
+        }
+
+        // Funzione per mostrare messaggi
+        function showMessage(message, isError = false) {
+            // Crea un elemento div per il messaggio se non esiste
+            let messageDiv = document.getElementById('message-banner');
+            if (!messageDiv) {
+                messageDiv = document.createElement('div');
+                messageDiv.id = 'message-banner';
+                messageDiv.className = 'message-banner';
+                document.body.appendChild(messageDiv);
+            }
+
+            messageDiv.textContent = message;
+            messageDiv.className = `message-banner ${isError ? 'error-message' : 'success-message'}`;
+            messageDiv.style.display = 'block';
+
+            // Stili per il messaggio
+            messageDiv.style.position = 'fixed';
+            messageDiv.style.top = '20px';
+            messageDiv.style.left = '50%';
+            messageDiv.style.transform = 'translateX(-50%)';
+            messageDiv.style.zIndex = '1000';
+            messageDiv.style.padding = '15px 20px';
+            messageDiv.style.borderRadius = '5px';
+            messageDiv.style.backgroundColor = isError ? '#f44336' : '#4CAF50';
+            messageDiv.style.color = 'white';
+            messageDiv.style.textAlign = 'center';
+            messageDiv.style.minWidth = '200px';
+            messageDiv.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+
+            // Nascondi il messaggio dopo 3 secondi
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // Carica i libri quando la pagina è pronta
+        document.addEventListener('DOMContentLoaded', loadBooks);
+    </script>
+</body>
+</html>
