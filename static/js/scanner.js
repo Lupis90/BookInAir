@@ -330,20 +330,7 @@ function updateBookInfo(bookInfo) {
     bookInfoDiv.style.display = 'block';
 }
 
-function handleBookData(data) {
-    if (data.book_info && data.book_info.title !== 'Book not found') {
-        currentBookISBN = data.isbn; // Assicurati che sia impostato qui
-        stopScanner();
-        showMessage(`Libro trovato: ${data.book_info.title}`);
-        updateBookInfo(data.book_info);
-        confirmISBNScan();
-    } else {
-        showMessage('Libro non trovato nel database. Riprova.', true);
-        currentBookISBN = null; // Reset se il libro non viene trovato
-    }
-}
-
-function confirmISBNScan() {
+function showLocationScanPrompt() {
     const bookInfoDiv = document.querySelector('.book-info');
     if (!bookInfoDiv) return;
 
@@ -365,6 +352,19 @@ function confirmISBNScan() {
 
     // Aggiungi il prompt mantenendo le informazioni del libro
     bookInfoDiv.innerHTML += promptHtml;
+}
+
+function handleBookData(data) {
+    if (data.book_info && data.book_info.title !== 'Book not found') {
+        currentBookISBN = data.isbn; // Assicurati che sia impostato qui
+        stopScanner();
+        showMessage(`Libro trovato: ${data.book_info.title}`);
+        updateBookInfo(data.book_info);
+        showLocationScanPrompt();
+    } else {
+        showMessage('Libro non trovato nel database. Riprova.', true);
+        currentBookISBN = null; // Reset se il libro non viene trovato
+    }
 }
 
 
