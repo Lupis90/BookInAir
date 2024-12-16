@@ -66,21 +66,10 @@
 
             <!-- Informazioni libro -->
             <div class="book-info"></div>
-
-            <!-- Container QR scanner posizione (spostato più in alto e reso più prominente) -->
-            <div id="qr-location-container" class="qr-location-scanner" style="display: none;">
-                <div class="location-scan-prompt">
-                    <h3>Scansiona il QR Code della Posizione</h3>
-                    <p>Inquadra il codice QR per registrare la posizione del libro</p>
-                </div>
-                <div id="qr-reader" class="qr-reader-viewport"></div>
-                <div class="qr-scan-actions">
-                    <button onclick="skipLocationScan()" class="skip-btn">
-                        <i class="fas fa-times"></i> Salta
-                    </button>
-                </div>
-            </div>
         </div>
+
+        <!-- Scanner QR code per posizione -->
+        <div id="qr-reader" class="qr-scanner" style="display: none;"></div>
 
         <!-- Preview libreria -->
         <div id="library" class="library-preview">
