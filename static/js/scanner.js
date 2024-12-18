@@ -6,6 +6,7 @@ let scanCount = {};
 let scanMode = 'ISBN';
 let currentBookISBN = null;
 let qrScanner = null;
+let lastBookFound = false; // New variable to track if the last scanned book was found
 const MIN_SUCCESSFUL_SCANS = 1;
 const SCAN_TIMEOUT = 2000;
 
@@ -284,6 +285,7 @@ function stopScanner() {
         console.error('Errore nello stop dello scanner:', err);
     }
 }
+
 // Funzioni di gestione dei libri e processing
 function processISBN(code, currentTime) {
     lastResult = code;
@@ -356,17 +358,34 @@ function showLocationScanPrompt() {
 
 function handleBookData(data) {
     if (data.book_info && data.book_info.title !== 'Book not found') {
-        currentBookISBN = data.isbn; // Assicurati che sia impostato qui
+        currentBookISBN = data.isbn;
+        lastBookFound = true; // Set to true when book is found
         stopScanner();
-        showMessage(`Libro trovato: ${data.book_info.title}`);
-        updateBookInfo(data.book_info);
-        showLocationScanPrompt();
+
+        // Mostra il popup con i dettagli del libro
+        document.getElementById('popup-title').textContent = `Titolo: ${data.book_info.title}`;
+        document.getElementById('popup-author').textContent = `Autore: ${data.book_info.author}`;
+        document.getElementById('popup').classList.remove('hidden');
+        document.getElementById('overlay').style.display = 'block';
     } else {
+        lastBookFound = false; // Set to false when book is not found
         showMessage('Libro non trovato nel database. Riprova.', true);
-        currentBookISBN = null; // Reset se il libro non viene trovato
     }
 }
 
+function closePopup() {
+    document.getElementById('popup').classList.add('hidden');
+    document.getElementById('overlay').style.display = 'none';
+    
+    if (lastBookFound) {
+        // Solo se il libro è stato trovato, mostra il prompt per la posizione
+        showLocationScanPrompt();
+        refreshLibrary(); // Aggiorna la libreria solo se il libro è stato trovato
+    } else {
+        // Se il libro non è stato trovato, riavvia solo lo scanner
+        toggleScanner();
+    }
+}
 
 function handleError(error) {
     console.error('Errore:', error);
@@ -377,15 +396,17 @@ function handleError(error) {
 // Gestione scansione posizione
 function startLocationScan() {
     scanMode = 'LOCATION';
-    stopScanner();
     
-    const qrReader = document.getElementById('qr-reader');
-    if (!qrReader) return;
+    // Chiudi il popup del libro
+    document.getElementById('popup').classList.add('hidden');
     
-    qrReader.style.display = 'block';
+    // Mostra il popup del QR scanner
+    const qrPopup = document.getElementById('qr-popup');
+    qrPopup.classList.remove('hidden');
+    document.getElementById('overlay').style.display = 'block';
     
     if (!qrScanner) {
-        qrScanner = new Html5Qrcode("qr-reader");
+        qrScanner = new Html5Qrcode("qr-reader-popup");
     }
     
     const qrConfig = {
@@ -406,11 +427,22 @@ function startLocationScan() {
     });
 }
 
+function closeQrPopup() {
+    stopQrScanner();
+    document.getElementById('qr-popup').classList.add('hidden');
+    document.getElementById('overlay').style.display = 'none';
+    scanMode = 'ISBN';
+    if (lastBookFound) {
+        refreshLibrary();
+    }
+    resetScannerInterface();
+}
+
 function onQRCodeSuccess(decodedText) {
     if (decodedText.startsWith('LOC:')) {
         const location = decodedText.substring(4);
         handleLocationScan(location);
-        stopQrScanner();
+        closeQrPopup();
     }
 }
 
@@ -422,11 +454,11 @@ function onQRCodeError(error) {
 }
 
 function skipLocationScan() {
-    scanMode = 'ISBN';
-    currentBookISBN = null;
-    refreshLibrary();
-    resetScannerInterface();
-}
+        scanMode = 'ISBN';
+        currentBookISBN = null; // Resetta currentBookISBN
+        refreshLibrary();
+        resetScannerInterface();
+    }
 
 function handleLocationScan(location) {
     if (!currentBookISBN) {
@@ -436,7 +468,6 @@ function handleLocationScan(location) {
 
     updateLocation(currentBookISBN, location);
 }
-
 
 function updateLocation(isbn, location) {
     showMessage('Aggiornamento posizione...', false);
@@ -464,12 +495,12 @@ function updateLocation(isbn, location) {
 }
 
 function completeLocationUpdate() {
-    stopQrScanner();
-    document.getElementById('qr-reader').style.display = 'none';
-    scanMode = 'ISBN';
-    currentBookISBN = null;
-    refreshLibrary();
-    resetScannerInterface();
+    stopQrScanner();
+    document.getElementById('qr-reader').style.display = 'none';
+    scanMode = 'ISBN';
+    currentBookISBN = null; // Resetta currentBookISBN
+    refreshLibrary();
+    resetScannerInterface();
 }
 
 function stopQrScanner() {

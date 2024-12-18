@@ -90,6 +90,32 @@
                 </table>
             </div>
         </div>
+
+        <!-- Popup libro -->
+        <div id="overlay"></div>
+        <div id="popup" class="popup hidden">
+            <div class="popup-content">
+                <h3 id="popup-title">Titolo</h3>
+                <p id="popup-author">Autore</p>
+                <button onclick="startLocationScan()" class="scan-location-btn">
+                    <i class="fas fa-qrcode"></i>
+                    Scansiona QR Code Posizione
+                </button>
+                <button onclick="closePopup()">Chiudi</button>
+            </div>
+        </div>
+
+        <!-- Popup QR Scanner -->
+        <div id="qr-popup" class="popup hidden">
+            <div class="popup-content">
+                <h3>Scansiona QR Code Posizione</h3>
+                <div id="qr-reader-popup" class="qr-scanner"></div>
+                <button onclick="closeQrPopup()" class="close-btn">
+                    <i class="fas fa-times"></i>
+                    Chiudi Scanner
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Scripts -->

@@ -448,7 +448,7 @@ body {
 }
 
 /* QR Reader Styles */
-#qr-reader {
+#qr-reader, #qr-reader-popup {
     margin: 0 auto;
     max-width: 500px;
     background: white;
@@ -483,6 +483,93 @@ body {
 #qr-reader video {
     border-radius: 4px;
     max-width: 100%;
+}
+
+/* Popup Styles */
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.7);
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    text-align: center;
+    width: 90%;
+    max-width: 500px;
+    opacity: 0;
+    transition: all 0.3s ease-in-out;
+}
+
+.popup:not(.hidden) {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.popup.hidden {
+    display: none;
+}
+
+.popup-content h3 {
+    color: #2c3e50;
+    margin: 0 0 15px 0;
+    font-size: 1.4em;
+}
+
+.popup-content p {
+    color: #666;
+    margin: 10px 0;
+    font-size: 1.1em;
+}
+
+.popup-content button {
+    margin-top: 20px;
+    padding: 12px 25px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.popup-content button i {
+    margin-right: 8px;
+}
+
+.popup-content button:hover {
+    background: #45a049;
+}
+
+.popup-content button.close-btn {
+    background: #6c757d;
+}
+
+.popup-content button.close-btn:hover {
+    background: #5a6268;
+}
+
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 1000;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#overlay:not([style*="display: none"]) {
+    opacity: 1;
 }
 
 /* Media Queries per responsività */
@@ -578,7 +665,7 @@ body {
         height: 300px;
     }
 
-    #qr-reader {
+    #qr-reader, #qr-reader-popup {
         width: 100%;
         padding: 10px;
     }
@@ -592,5 +679,10 @@ body {
     .skip-btn {
         width: 100%;
         margin: 5px 0;
+    }
+
+    .popup {
+        width: 95%;
+        padding: 20px;
     }
 }
