@@ -428,10 +428,11 @@ function startLocationScan() {
 }
 
 function closeQrPopup() {
-    stopQrScanner();
+    stopQrScanner(); // Chiama stopQrScanner quando il popup viene chiuso
     document.getElementById('qr-popup').classList.add('hidden');
     document.getElementById('overlay').style.display = 'none';
     scanMode = 'ISBN';
+
     if (lastBookFound) {
         refreshLibrary();
     }
@@ -439,6 +440,10 @@ function closeQrPopup() {
 }
 
 function onQRCodeSuccess(decodedText) {
+    if (scanMode !== 'LOCATION') {
+        console.log('Scansione QR ignorata - scanMode non è LOCATION');
+        return;
+    }
     if (decodedText.startsWith('LOC:')) {
         const location = decodedText.substring(4);
         handleLocationScan(location);
@@ -454,20 +459,20 @@ function onQRCodeError(error) {
 }
 
 function skipLocationScan() {
-        scanMode = 'ISBN';
-        currentBookISBN = null; // Resetta currentBookISBN
-        refreshLibrary();
-        resetScannerInterface();
-    }
-
-function handleLocationScan(location) {
-    if (!currentBookISBN) {
-        showMessage('Errore: seleziona prima un libro scansionando il codice ISBN.', true);
-        return;
-    }
-
-    updateLocation(currentBookISBN, location);
+    stopQrScanner(); // Assicurati che lo scanner QR sia fermato
+    scanMode = 'ISBN';
+    currentBookISBN = null; // Resetta currentBookISBN
+    refreshLibrary();
+    resetScannerInterface();
 }
+
+    function handleLocationScan(location) {
+        if (!currentBookISBN) {
+            showMessage('Errore: seleziona prima un libro scansionando il codice ISBN.', true);
+            return;
+        }
+        updateLocation(currentBookISBN, location);
+    }
 
 function updateLocation(isbn, location) {
     showMessage('Aggiornamento posizione...', false);
@@ -494,13 +499,15 @@ function updateLocation(isbn, location) {
     });
 }
 
-function completeLocationUpdate() {
-    stopQrScanner();
-    document.getElementById('qr-reader').style.display = 'none';
-    scanMode = 'ISBN';
-    currentBookISBN = null; // Resetta currentBookISBN
-    refreshLibrary();
-    resetScannerInterface();
+async function completeLocationUpdate() {
+    stopQrScanner(); // Ora chiama direttamente stopQrScanner senza attendere
+    document.getElementById('qr-popup').classList.add('hidden'); // Nascondi il popup
+    document.getElementById('overlay').style.display = 'none'; // Nascondi l'overlay
+
+    scanMode = 'ISBN';
+    currentBookISBN = null; // Resetta currentBookISBN
+    refreshLibrary();
+    resetScannerInterface();
 }
 
 function stopQrScanner() {

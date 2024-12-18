@@ -1,2 +1,2 @@
-venv/;
-books.db;
+venv/
+books.db
